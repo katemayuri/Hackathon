@@ -580,22 +580,13 @@
         </div>
         <div class="navigation">
             <button class="button" onclick="prevQuestion(3)"><i class="fas fa-arrow-left"></i> Back</button>
-            <button class="button" onclick="nextQuestion(5)">Next <i class="fas fa-arrow-right"></i></button>
+            <button class="button" onclick="generateToDoList()"><i class="fas fa-list-ul"></i> Get To-Do List</button>
+            <!-- Button to add the question dynamically -->
+            <button id="addQuestionButton">Add Question</button>
         </div>
     </div>
-    <div class="question hidden" id="question5" style="display: none;">
-        <div class="slider-container">
-            <label class="slider-label" for="exercise"><i class="fas fa-dumbbell"></i> How often do you exercise?</label>
-            <input type="range" id="exercise" class="slider" min="1" max="10" step="1" />
-            <div class="slider-values">
-                <span>Rarely</span>
-                <span>Very often</span>
-            </div>
-        </div>
-        <div class="navigation">
-            <button class="button" onclick="prevQuestion(4)"><i class="fas fa-arrow-left"></i> Back</button>
-            <button class="button" onclick="generateToDoList()"><i class="fas fa-list-ul"></i> Get To-Do List</button>
-        </div>
+
+    <div id="questionContainer">  
     </div>
 </div>
 
@@ -694,8 +685,6 @@
         const sleepQuality = document.getElementById('sleepQuality').value;
         const exercise = document.getElementById('exercise').value;
         let toDoList = "<h2><i class='fas fa-check-circle'></i> Recommended To-Do List:</h2><ul>";
-        
-        // Add tasks based on stress frequency
         if (stressFrequency >= 7) {
             toDoList += `<li><input type="checkbox"> <i class="fas fa-spa"></i> Engage in mindfulness or meditation sessions daily.</li>`;
         } else if (stressFrequency >= 4) {
@@ -703,8 +692,6 @@
         } else {
             toDoList += `<li><input type="checkbox"> <i class="fas fa-peace"></i> Maintain your current stress management practices.</li>`;
         }
-        
-        // Add tasks based on sleep quality
         if (sleepQuality <= 4) {
             toDoList += `<li><input type="checkbox"> <i class="fas fa-moon"></i> Establish a consistent bedtime routine and avoid caffeine before bed.</li>`;
         } else if (sleepQuality <= 7) {
@@ -712,8 +699,6 @@
         } else {
             toDoList += `<li><input type="checkbox"> <i class="fas fa-star"></i> Continue your good sleep habits.</li>`;
         }
-        
-        // Add tasks based on exercise frequency
         if (exercise <= 4) {
             toDoList += `<li><input type="checkbox"> <i class="fas fa-walking"></i> Start with light exercises like walking or stretching daily.</li>`;
         } else if (exercise <= 7) {
@@ -721,7 +706,6 @@
         } else {
             toDoList += `<li><input type="checkbox"> <i class="fas fa-dumbbell"></i> Keep up with your regular exercise routine.</li>`;
         }
-        
         toDoList += "</ul>";
         toDoList += `
             <div class="navigation">
@@ -729,9 +713,14 @@
                 <button class="button" onclick="resetForm()"><i class="fas fa-redo"></i> Start Again</button>
             </div>
         `;
-        
         document.getElementById('toDoList').innerHTML = toDoList;
         document.getElementById('toDoList').classList.remove('hidden');
+        
+        // Add event listeners to checkboxes
+        const checkboxes = document.querySelectorAll('#toDoList input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', checkAllTasks);
+        });
     }
 
     function printToDoList() {
@@ -841,6 +830,71 @@
     document.querySelectorAll('#question1 .choice').forEach(choice => {
         choice.setAttribute('onclick', 'nextQuestion(2)');
     });
+</script>
+
+<script>
+    // Attach event listener to the button
+    document.getElementById('addQuestionButton').addEventListener('click', function () {
+      // Sample JSON data
+      const questionData = {
+        "question": "Which activities do you enjoy?",
+        "type": "checkbox", // Use "radio" for single choice
+        "options": ["Reading", "Traveling", "Cooking", "Sports"]
+      };
+
+      // Call the function to add the question
+      addMultipleChoiceQuestion(questionData);
+    });
+
+    function addMultipleChoiceQuestion(jsonData) {
+    // Get the container where the new question will be added
+    const container = document.getElementById('questionContainer');
+
+    // Create a div for the new question
+    const questionDiv = document.createElement('div');
+    questionDiv.classList.add('question');
+
+    // Create the question label
+    const questionLabel = document.createElement('h3');
+    questionLabel.textContent = jsonData.question;
+
+    // Append the question label to the question div
+    questionDiv.appendChild(questionLabel);
+
+    // Create the div to hold the options
+    const optionsDiv = document.createElement('div');
+    optionsDiv.classList.add('options-container');
+
+    // Generate the options based on the type (radio/checkbox)
+    jsonData.options.forEach(option => {
+        // Create a wrapper for each option
+        const optionWrapper = document.createElement('div');
+        optionWrapper.classList.add('option-wrapper');
+
+        // Create the input element (radio/checkbox)
+        const input = document.createElement('input');
+        input.type = jsonData.type; // Either "radio" or "checkbox"
+        input.name = 'questionOptions'; // Name ensures grouping for radio buttons
+        input.value = option;
+
+        // Create the label for the input
+        const label = document.createElement('label');
+        label.textContent = option;
+
+        // Append the input and label to the wrapper
+        optionWrapper.appendChild(input);
+        optionWrapper.appendChild(label);
+
+        // Append the wrapper to the options container
+        optionsDiv.appendChild(optionWrapper);
+    });
+
+    // Append the options container to the question div
+    questionDiv.appendChild(optionsDiv);
+
+    // Append the question div to the main container
+    container.appendChild(questionDiv);
+    }
 </script>
 
 </body>
