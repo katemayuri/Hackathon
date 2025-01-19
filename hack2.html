@@ -62,7 +62,7 @@
     <!-- Static Questions -->
     <div class="question">
       <h4>1. What is your favorite color?</h4>
-      <select>
+      <select onchange="updateAnswer('What is your favorite color?', this.value)">
         <option value="red">Red</option>
         <option value="blue">Blue</option>
         <option value="green">Green</option>
@@ -70,7 +70,7 @@
     </div>
     <div class="question">
       <h4>2. What is your preferred mode of transport?</h4>
-      <select>
+      <select onchange="updateAnswer('What is your preferred mode of transport?', this.value)">
         <option value="car">Car</option>
         <option value="bike">Bike</option>
         <option value="public">Public Transport</option>
@@ -78,7 +78,7 @@
     </div>
     <div class="question">
       <h4>3. What type of music do you like?</h4>
-      <select>
+      <select onchange="updateAnswer('What type of music do you like?', this.value)">
         <option value="pop">Pop</option>
         <option value="rock">Rock</option>
         <option value="classical">Classical</option>
@@ -89,10 +89,17 @@
 
   <script>
     let questionCounter = 3; // Starts after the static questions
+    let answers = {}; // Object to store answers
 
-    function simulateAjaxCall() {
+    function updateAnswer(questiontext, answer) {
+      answers[questiontext] = answer;
+      console.log("Updated Answers:", answers);
+    }
+
+    function simulateAjaxCall(dataToSend) {
       return new Promise((resolve) => {
         setTimeout(() => {
+          console.log("Received data from client:", dataToSend);
           resolve({
             questions: [
               {
@@ -118,7 +125,7 @@
       button.disabled = true; // Disable button during the API call
 
       // Simulate AJAX API call using the simulateAjaxCall function
-      simulateAjaxCall()
+      simulateAjaxCall(answers)
         .then(data => {
           const questionsContainer = document.getElementById('questions-container');
 
@@ -131,7 +138,7 @@
             
             questionElement.innerHTML = `
               <h4>${questionCounter}. ${question.text}</h4>
-              <select>
+              <select onchange="updateAnswer('${question.text}', this.value)">
                 ${options}
               </select>
             `;
