@@ -611,6 +611,8 @@
 </div>
 
 <script>
+    let userResponses = {};
+
     // Update progress bar calculation
     function updateProgress(questionNumber) {
         const progress = (questionNumber - 1) * 20; // Adjusted for 5 questions total
@@ -680,47 +682,48 @@
     });
 
     function generateToDoList() {
-        document.getElementById('questionnaire').style.display = 'none';
-        const stressFrequency = document.getElementById('stressFrequency').value;
-        const sleepQuality = document.getElementById('sleepQuality').value;
-        const exercise = document.getElementById('exercise').value;
-        let toDoList = "<h2><i class='fas fa-check-circle'></i> Recommended To-Do List:</h2><ul>";
-        if (stressFrequency >= 7) {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-spa"></i> Engage in mindfulness or meditation sessions daily.</li>`;
-        } else if (stressFrequency >= 4) {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-coffee"></i> Take short breaks throughout the day to relax.</li>`;
-        } else {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-peace"></i> Maintain your current stress management practices.</li>`;
-        }
-        if (sleepQuality <= 4) {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-moon"></i> Establish a consistent bedtime routine and avoid caffeine before bed.</li>`;
-        } else if (sleepQuality <= 7) {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-clock"></i> Aim for an additional hour of sleep by adjusting your schedule.</li>`;
-        } else {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-star"></i> Continue your good sleep habits.</li>`;
-        }
-        if (exercise <= 4) {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-walking"></i> Start with light exercises like walking or stretching daily.</li>`;
-        } else if (exercise <= 7) {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-bicycle"></i> Incorporate moderate exercise, such as cycling or swimming, thrice a week.</li>`;
-        } else {
-            toDoList += `<li><input type="checkbox"> <i class="fas fa-dumbbell"></i> Keep up with your regular exercise routine.</li>`;
-        }
-        toDoList += "</ul>";
-        toDoList += `
-            <div class="navigation">
-                <button class="button" onclick="printToDoList()"><i class="fas fa-print"></i> Print as PDF</button>
-                <button class="button" onclick="resetForm()"><i class="fas fa-redo"></i> Start Again</button>
-            </div>
-        `;
-        document.getElementById('toDoList').innerHTML = toDoList;
-        document.getElementById('toDoList').classList.remove('hidden');
+        console.log(userResponses);
+        // document.getElementById('questionnaire').style.display = 'none';
+        // const stressFrequency = document.getElementById('stressFrequency').value;
+        // const sleepQuality = document.getElementById('sleepQuality').value;
+        // const exercise = document.getElementById('exercise').value;
+        // let toDoList = "<h2><i class='fas fa-check-circle'></i> Recommended To-Do List:</h2><ul>";
+        // if (stressFrequency >= 7) {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-spa"></i> Engage in mindfulness or meditation sessions daily.</li>`;
+        // } else if (stressFrequency >= 4) {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-coffee"></i> Take short breaks throughout the day to relax.</li>`;
+        // } else {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-peace"></i> Maintain your current stress management practices.</li>`;
+        // }
+        // if (sleepQuality <= 4) {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-moon"></i> Establish a consistent bedtime routine and avoid caffeine before bed.</li>`;
+        // } else if (sleepQuality <= 7) {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-clock"></i> Aim for an additional hour of sleep by adjusting your schedule.</li>`;
+        // } else {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-star"></i> Continue your good sleep habits.</li>`;
+        // }
+        // if (exercise <= 4) {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-walking"></i> Start with light exercises like walking or stretching daily.</li>`;
+        // } else if (exercise <= 7) {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-bicycle"></i> Incorporate moderate exercise, such as cycling or swimming, thrice a week.</li>`;
+        // } else {
+        //     toDoList += `<li><input type="checkbox"> <i class="fas fa-dumbbell"></i> Keep up with your regular exercise routine.</li>`;
+        // }
+        // toDoList += "</ul>";
+        // toDoList += `
+        //     <div class="navigation">
+        //         <button class="button" onclick="printToDoList()"><i class="fas fa-print"></i> Print as PDF</button>
+        //         <button class="button" onclick="resetForm()"><i class="fas fa-redo"></i> Start Again</button>
+        //     </div>
+        // `;
+        // document.getElementById('toDoList').innerHTML = toDoList;
+        // document.getElementById('toDoList').classList.remove('hidden');
         
-        // Add event listeners to checkboxes
-        const checkboxes = document.querySelectorAll('#toDoList input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', checkAllTasks);
-        });
+        // // Add event listeners to checkboxes
+        // const checkboxes = document.querySelectorAll('#toDoList input[type="checkbox"]');
+        // checkboxes.forEach(checkbox => {
+        //     checkbox.addEventListener('change', checkAllTasks);
+        // });
     }
 
     function printToDoList() {
@@ -830,6 +833,61 @@
     document.querySelectorAll('#question1 .choice').forEach(choice => {
         choice.setAttribute('onclick', 'nextQuestion(2)');
     });
+
+    function collectResponse(questionId, response) {
+        let questionElement;
+        
+        // First, try to find a 'p' element (for choice questions)
+        questionElement = document.querySelector(`#${questionId} p`);
+        
+        // If 'p' element is not found, look for a 'label' element (for slider questions)
+        if (!questionElement) {
+            questionElement = document.querySelector(`#${questionId} label.slider-label`);
+        }
+        
+        // If we found either a 'p' or a 'label' element, get its text content
+        if (questionElement) {
+            const question = questionElement.textContent.trim();
+            userResponses[question] = response;
+        } else {
+            console.error(`Could not find question text for ${questionId}`);
+        }
+    }
+
+    function setupInputListeners() {
+        const allInputElements = document.querySelectorAll(
+            '.choice, .slider, input, select, textarea'
+        );
+
+        allInputElements.forEach(element => {
+            // Handle different input types
+            if (element.classList.contains('choice')) {
+                element.addEventListener('click', function() {
+                    const questionId = this.closest('.question').id;
+                    const response = this.textContent.trim();
+                    collectResponse(questionId, response);
+                });
+            } else if (element.classList.contains('slider')) {
+                element.addEventListener('change', function() {
+                    const questionId = this.closest('.question').id;
+                    const response = this.value;
+                    collectResponse(questionId, response);
+                });
+            } else {
+                // Standard form inputs
+                element.addEventListener('change', function() {
+                    const questionId = this.closest('.question').id;
+                    const response = this.value;
+                    collectResponse(questionId, response);
+                });
+            }
+        });
+    }
+
+    // Call this function when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', setupInputListeners);
+
+
 </script>
 
 <script>
@@ -895,6 +953,26 @@
     // Append the question div to the main container
     container.appendChild(questionDiv);
     }
+</script>
+
+<script>
+
+
+
+
+    // For slider questions
+    function updateSliderResponse(sliderId) {
+        const slider = document.getElementById(sliderId);
+        const question = slider.previousElementSibling.textContent.trim();
+        userResponses[question] = slider.value;
+    }
+
+    // Add event listeners to sliders
+    document.getElementById('stressFrequency').addEventListener('input', () => updateSliderResponse('stressFrequency'));
+    document.getElementById('sleepQuality').addEventListener('input', () => updateSliderResponse('sleepQuality'));
+
+
+
 </script>
 
 </body>
